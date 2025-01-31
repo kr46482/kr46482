@@ -1,0 +1,54 @@
+import folder
+
+# Define the game board size and candy types
+BOARD_SIZE = 8
+CANDY_TYPES = ["R", "V", "B", "Y", "P"]  # Red, Voilet, Blue, Yellow, pink
+
+# Create a random board
+def generate_board():
+    return [[random.choice(CANDY_TYPES) for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
+
+# Print the board
+def print_board(board):
+    for row in board:
+        print(" ".join(row))
+    print("\n")
+
+# Check for matches
+def check_matches(board):
+    matches = set()
+    for row in range(BOARD_SIZE):
+        for col in range(BOARD_SIZE - 2):
+            if board[row][col] == board[row][col+1] == board[row][col+2]:
+                matches.update([(row, col), (row, col+1), (row, col+2)])
+
+    for col in range(BOARD_SIZE):
+        for row in range(BOARD_SIZE - 2):
+            if board[row][col] == board[row+1][col] == board[row+2][col]:
+                matches.update([(row, col), (row+1, col), (row+2, col)])
+
+    return matches
+
+# Remove matched candies and shift down
+def remove_matches(board, matches):
+    for row, col in matches:
+        board[row][col] = None  # Mark for removal
+
+    for col in range(BOARD_SIZE):
+        candies = [board[row][col] for row in range(BOARD_SIZE) if board[row][col] is not None]
+        for row in range(BOARD_SIZE - len(candies)):
+            board[row][col] = random.choice(CANDY_TYPES)  # Fill with new candies
+        for row in range(len(candies)):
+            board[BOARD_SIZE - len(candies) + row][col] = candies[row]
+
+# Run a simple match-check loop
+board = generate_board()
+print("Initial Board:")
+print_board(board)
+
+matches = check_matches(board)
+while matches:
+    print("Matches found and removed!")
+    remove_matches(board, matches)
+    print_board(board)
+    matches = check_matches(board)
